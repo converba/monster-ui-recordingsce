@@ -1,0 +1,19 @@
+{
+	"name": "monster-ui-recordingsce",
+	"description": "The Recordings app allows you manage your recordings",
+	"version": "1.0.0",
+	"dependencies": {},
+	"devDependencies": {
+		"gulp": "^4.0.0",
+		"gulp-clean": "^0.4.0",
+		"gulp-sass": "^4.0.2"
+	},
+	"main": "gulpfile-build-app.js",
+	"scripts": {
+		"build": "gulp --gulpfile ./gulpfile-build-app.js"
+	},
+	"keywords": [],
+	"author": "(C) 2019 CONVERBA LIMITED",
+	"license": "Mozilla Public License Version 2.0",
+	"private": true
+}
