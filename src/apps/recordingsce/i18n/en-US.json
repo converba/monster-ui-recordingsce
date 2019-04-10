@@ -1,0 +1,77 @@
+{
+	"recordings": {
+		"title": "Recordings",
+		"description": "Feel free to update the HTML template located in /apps/recordings/views/layout.html. The Javascript to manage this app is located in /apps/recordings/app.js.",
+		"welcome": "Welcome {{variable}} to the Recordings App",
+		"recordingsTable": {
+			"title": "Recordings",
+			"columnHeader": {
+				"direction": "IN/OUT",
+				"datetime": "Datetime",
+				"user": "User",
+				"device": "Device",
+				"dialerNumber": "Dialer Number",
+				"duration": "Duration",
+				"actions": "Actions"
+			},
+			"playBtnText": "Play",
+			"downloadBtnText": "Download"
+		},
+		"filters": {
+			"datetime": {
+				"to": "to",
+				"allTime": "all time",
+				"lastYear": "last year",
+				"lastMonth": "last month",
+				"lastWeek": "last week",
+				"lastDay": "last day",
+				"lastHour": "last hour"
+			},
+			"direction": {
+				"all": "IN/OUT",
+				"outbound": "OUT",
+				"inbound": "IN"
+			},
+			"userName": {
+				"placeholder": "Choose a user name..."
+			},
+			"deviceName": {
+				"placeholder": "Choose a device name..."
+			},
+			"duration": {
+				"title": "Duration:",
+				"seconds": "sec."
+			},
+			"resetBtn": {
+				"text": "Reset filters"
+			}
+			
+		},
+		"settingsBtnText": "Settings",
+		"storageManager": {
+			"title": "Storage settings",
+			"newStorageBtnText": "New storage",
+			"itemSettings": {
+				"nameLabel": "Storage name",
+				"bucketLabel": "Bucket name",
+				"keyLabel": "Key",
+				"secretLabel": "Secret",
+				"saveBtnText": "Save Changes",
+				"cancelBtnText": "Cancel",
+				"successUpdate": "Your Storage Settings were successfully updated!",
+				"setDefaultLabel": "Set default"
+			},
+			"newItem": {
+				"saveNewItemText": "Create",
+				"cancelBtnText": "Cancel"
+			},
+			"confirmDelete": "Yes, Remove Storage",
+			"confirmDeleteText": "This will remove this Storage from this account.",
+			"confirmDeleteTitle": "Warning! Are you sure?",
+			"successRemovingMessage": "You successfully removed the storage.",
+			"successSavingMessage": "You successfully saved the storage.",
+			"successUpdate": "Your Storage Settings were successfully updated!",
+			"alreadyActiveMessage": "This storage is already active"
+		}
+	}
+}
