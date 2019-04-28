@@ -1,7 +1,8 @@
 {
-	"recordings": {
+	"recordingsce": {
 		"title": "Recordings",
-		"description": "Feel free to update the HTML template located in /apps/recordings/views/layout.html. The Javascript to manage this app is located in /apps/recordings/app.js.",
+		"description": "Feel free to update the HTML template located in /apps/recordingsce/views/layout.html. The Javascript to manage this app is located in /apps/recordingsce/app.js.",
+		"storageIsNotConfiguredMessage": "Storage is not configured, please contact your system administrator.",
 		"welcome": "Welcome {{variable}} to the Recordings App",
 		"recordingsTable": {
 			"title": "Recordings",
@@ -46,32 +47,6 @@
 				"text": "Reset filters"
 			}
 			
-		},
-		"settingsBtnText": "Settings",
-		"storageManager": {
-			"title": "Storage settings",
-			"newStorageBtnText": "New storage",
-			"itemSettings": {
-				"nameLabel": "Storage name",
-				"bucketLabel": "Bucket name",
-				"keyLabel": "Key",
-				"secretLabel": "Secret",
-				"saveBtnText": "Save Changes",
-				"cancelBtnText": "Cancel",
-				"successUpdate": "Your Storage Settings were successfully updated!",
-				"setDefaultLabel": "Set default"
-			},
-			"newItem": {
-				"saveNewItemText": "Create",
-				"cancelBtnText": "Cancel"
-			},
-			"confirmDelete": "Yes, Remove Storage",
-			"confirmDeleteText": "This will remove this Storage from this account.",
-			"confirmDeleteTitle": "Warning! Are you sure?",
-			"successRemovingMessage": "You successfully removed the storage.",
-			"successSavingMessage": "You successfully saved the storage.",
-			"successUpdate": "Your Storage Settings were successfully updated!",
-			"alreadyActiveMessage": "This storage is already active"
 		}
 	}
 }

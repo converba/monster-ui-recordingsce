@@ -86,36 +86,17 @@ define(function(require) {
 				args = pArgs || {};
 				self.vars.$appContainer = args.container || $('#recordings_app_container .app-content-wrapper');
 
-			self.log('renderIndex');
+			if(!monster.util.isAdmin()) {
+				self.log('Permission error. Use admin account for change storage settings');
+				return;
+			}
 
 			var template = $(monster.template(self, 'layout', {
 				user: monster.apps.auth.currentUser,
 				isAdmin: monster.util.isAdmin()
 			}));
 
-			self.vars.$appContainer.fadeOut(function() {
-				$(this).empty()
-					.append(template)
-					.fadeIn();
-				self._insertSettingsBtn(template);
-			});
-
 			self._renderRecordingsList();
-		},
-
-		_insertSettingsBtn: function(template) {
-			var self = this;
-			if(monster.util.isAdmin()) {
-				self._initSettingsButtonBehavior();
-			}
-
-			template.on('click', '.js-close-settings', function(e) {
-				e.preventDefault();
-				$('.js-storages-settings').slideUp(400, function(){
-					$(this).find('.js-settings-content').empty();
-					$('.js-settings-btn').fadeIn();
-				});
-			});
 		},
 
 		_getRecordings: function(callback) {
@@ -161,10 +142,9 @@ define(function(require) {
 			});
 		},
 
-		_renderRecordingsList: function(stopIteration) {
+		_renderRecordingsList: function() {
 			var self = this;
-
-			// TODO: Do request to storage
+			var storageIsNotConfiguredMessage = self.i18n.active().recordingsce.storageIsNotConfiguredMessage;
 
 			self.callApi({
 				resource: 'storage.get',
@@ -174,9 +154,6 @@ define(function(require) {
 					generateError: self.settings.debug
 				},
 				success: function(data, status) {
-					self.log('Storage data:');
-					self.log(data);
-
 					try {
 						var storageUUID = data.data.plan.modb.types.call_recording.attachments.handler;
 						var storageData = data.data.attachments[storageUUID];
@@ -185,16 +162,11 @@ define(function(require) {
 							self._renderRecordingsTable(recordings);
 						});
 					} catch(e) {
-						// Open settings to create new storage
-						$('#settings-btn').click();
+						monster.ui.alert(storageIsNotConfiguredMessage);
 					}
 				},
 				error: function(response) {
-					if(response && response.error === '404'&& !stopIteration) {
-						self._doStorageInitialRequest(function() {
-							self._renderRecordingsList(true);
-						});
-					}
+					monster.ui.alert(storageIsNotConfiguredMessage);
 				}
 			});
 		},
@@ -396,33 +368,6 @@ define(function(require) {
 				},
 				error: callApiData.error || function(){}
 			});
-		},
-
-		_initSettingsButtonBehavior: function() {
-			var self = this;
-
-			$('.js-settings-btn').not('.handled').on('click', function(e) {
-				e.preventDefault();
-
-				var $settingsContainer = $('.js-storages-settings');
-
-				if($settingsContainer.is(':hidden')) {
-					monster.pub('storageConfig.render', {
-						callback: function(data) {
-							self.log(data);
-						},
-						onSetDefault: function(){
-							self._renderRecordingsList();
-						},
-						container: $settingsContainer.find('.js-settings-content')
-					});
-				} else {
-					$settingsContainer.slideUp(400, function() {
-						$(this).find('.js-settings-content').empty();
-					});
-				}
-				$(this).fadeOut();
-			}).addClass('handled');
 		},
 
 		_initDateTimePickers: function() {

@@ -2,30 +2,30 @@
 	<div class="filter-item datetime-filter">
 		<input id="date-from" class="date-input" type="text"/>
 		<input id="time-from" class="time-input" type="text"/>
-		<span class="delimiter">{{i18n.recordings.filters.datetime.to}}</span>
+		<span class="delimiter">{{i18n.recordingsce.filters.datetime.to}}</span>
 		<input id="date-to" class="date-input" type="text"/>
 		<input id="time-to" class="time-input" type="text"/>
 		<div class="set-date-buttons">
-			<a href="" class="js-set-date-range" data-range="all">{{i18n.recordings.filters.datetime.allTime}}</a>
-			<a href="" class="js-set-date-range" data-range="last-year">{{i18n.recordings.filters.datetime.lastYear}}</a>
-			<a href="" class="js-set-date-range" data-range="last-month">{{i18n.recordings.filters.datetime.lastMonth}}</a>
-			<a href="" class="js-set-date-range" data-range="last-week">{{i18n.recordings.filters.datetime.lastWeek}}</a>
-			<a href="" class="js-set-date-range" data-range="last-day">{{i18n.recordings.filters.datetime.lastDay}}</a>
-			<a href="" class="js-set-date-range" data-range="last-hour">{{i18n.recordings.filters.datetime.lastHour}}</a>
+			<a href="" class="js-set-date-range" data-range="all">{{i18n.recordingsce.filters.datetime.allTime}}</a>
+			<a href="" class="js-set-date-range" data-range="last-year">{{i18n.recordingsce.filters.datetime.lastYear}}</a>
+			<a href="" class="js-set-date-range" data-range="last-month">{{i18n.recordingsce.filters.datetime.lastMonth}}</a>
+			<a href="" class="js-set-date-range" data-range="last-week">{{i18n.recordingsce.filters.datetime.lastWeek}}</a>
+			<a href="" class="js-set-date-range" data-range="last-day">{{i18n.recordingsce.filters.datetime.lastDay}}</a>
+			<a href="" class="js-set-date-range" data-range="last-hour">{{i18n.recordingsce.filters.datetime.lastHour}}</a>
 		</div>
 	</div>
 	<div class="filter-item direction-filter">
 		<div class="form-group">
 			<select class="form-control" id="direction">
-				<option value="all" selected>{{i18n.recordings.filters.direction.all}}</option>
-				<option value="OUT">{{i18n.recordings.filters.direction.outbound}}</option>
-				<option value="IN">{{i18n.recordings.filters.direction.inbound}}</option>
+				<option value="all" selected>{{i18n.recordingsce.filters.direction.all}}</option>
+				<option value="OUT">{{i18n.recordingsce.filters.direction.outbound}}</option>
+				<option value="IN">{{i18n.recordingsce.filters.direction.inbound}}</option>
 			</select>
 		</div>
 	</div>
 	<div class="filter-item user-name-filter">
 		<div class="form-group">
-			<select data-placeholder="{{i18n.recordings.filters.userName.placeholder}}" class="form-control" id="user-name-select" multiple>
+			<select data-placeholder="{{i18n.recordingsce.filters.userName.placeholder}}" class="form-control" id="user-name-select" multiple>
 				{{#each this.usersNames}}
 					<option value="{{this}}">{{this}}</option>
 				{{/each}}
@@ -34,7 +34,7 @@
 	</div>
 	<div class="filter-item device-name-filter">
 		<div class="form-group">
-			<select data-placeholder="{{i18n.recordings.filters.deviceName.placeholder}}" class="form-control" id="device-name-select" multiple>
+			<select data-placeholder="{{i18n.recordingsce.filters.deviceName.placeholder}}" class="form-control" id="device-name-select" multiple>
 				{{#each this.devicesNames}}
 					<option value="{{this}}">{{this}}</option>
 				{{/each}}
@@ -44,7 +44,7 @@
 	<div class="filter-item duration-filter">
 		<div id="duration-slider"></div>
 		<div class="duration-filter-values">
-			<span>{{i18n.recordings.filters.duration.title}} </span>
+			<span>{{i18n.recordingsce.filters.duration.title}} </span>
 			<span id="duration-range-min" data-seconds="{{duration.min}}">{{duration.minHHMMSS}}</span>&nbsp;-&nbsp;
 			<span id="duration-range-max" data-seconds="{{duration.max}}">{{duration.maxHHMMSS}}</span>
 		</div>
@@ -56,7 +56,7 @@
 		{{!--  reserved container for move here --}}
 	</div>
 	<div class="filter-item reset-filter">
-		<a id="reset-filters" class="btn">{{i18n.recordings.filters.resetBtn.text}}</a>
+		<a id="reset-filters" class="btn">{{i18n.recordingsce.filters.resetBtn.text}}</a>
 	</div>
 
 </div>
@@ -64,14 +64,14 @@
 	<thead>
 		<tr>
 			<th>№</th>
-			<th>{{i18n.recordings.recordingsTable.columnHeader.direction}}</th>
-			<th>{{i18n.recordings.recordingsTable.columnHeader.datetime}}</th>
-			<th>{{i18n.recordings.recordingsTable.columnHeader.user}}</th>
-			<th>{{i18n.recordings.recordingsTable.columnHeader.device}}</th>
-			<th>{{i18n.recordings.recordingsTable.columnHeader.dialerNumber}}</th>
-			<th>{{i18n.recordings.recordingsTable.columnHeader.duration}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.direction}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.datetime}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.user}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.device}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.dialerNumber}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.duration}}</th>
 			<th class="recordings-table__actions-col no-sort">
-				{{i18n.recordings.recordingsTable.columnHeader.actions}}
+				{{i18n.recordingsce.recordingsTable.columnHeader.actions}}
 			</th>
 		</tr>
 	</thead>
@@ -89,11 +89,11 @@
 				<div class="buttons-wrapper">
 					<a class="btn js-play-recording" data-recording-id="{{id}}">
 						<i class="fa fa-play"></i>
-						{{@root.i18n.recordings.recordingsTable.playBtnText}}
+						{{@root.i18n.recordingsce.recordingsTable.playBtnText}}
 					</a>
 					<a class="btn js-download-recording" data-recording-id="{{id}}">
 						<i class="fa fa-download"></i>
-						{{@root.i18n.recordings.recordingsTable.downloadBtnText}}
+						{{@root.i18n.recordingsce.recordingsTable.downloadBtnText}}
 					</a>
 				</div>
 				<audio id="recording-player-{{id}}" controls="controls" style="display: none"></audio>
