@@ -2,7 +2,7 @@
 	"recordingsce": {
 		"title": "Recordings",
 		"description": "Feel free to update the HTML template located in /apps/recordingsce/views/layout.html. The Javascript to manage this app is located in /apps/recordingsce/app.js.",
-		"storageIsNotConfiguredMessage": "Storage is not configured, please contact your system administrator.",
+		"universalErrorMessageTemplate": "Please contact your system administrator to configure %api% API, required for this application to work",
 		"welcome": "Welcome {{variable}} to the Recordings App",
 		"recordingsTable": {
 			"title": "Recordings",

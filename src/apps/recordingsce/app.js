@@ -91,11 +91,6 @@ define(function(require) {
 				return;
 			}
 
-			var template = $(monster.template(self, 'layout', {
-				user: monster.apps.auth.currentUser,
-				isAdmin: monster.util.isAdmin()
-			}));
-
 			self._renderRecordingsList();
 		},
 
@@ -116,6 +111,8 @@ define(function(require) {
 				error: function(data) {
 					self.log('Error while getting recordings');
 					self.log(data);
+					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'Recordings');
+					monster.ui.alert(errorMessage);
 				}
 			});
 		},
@@ -138,36 +135,17 @@ define(function(require) {
 					//_callback({}, uiRestrictions);
 					self.log('Error while getting cdrs');
 					self.log(data);
+					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'CDRs');
+					monster.ui.alert(errorMessage);
 				}
 			});
 		},
 
 		_renderRecordingsList: function() {
 			var self = this;
-			var storageIsNotConfiguredMessage = self.i18n.active().recordingsce.storageIsNotConfiguredMessage;
 
-			self.callApi({
-				resource: 'storage.get',
-				data: {
-					accountId: self.accountId,
-					removeMetadataAPI: true,
-					generateError: self.settings.debug
-				},
-				success: function(data, status) {
-					try {
-						var storageUUID = data.data.plan.modb.types.call_recording.attachments.handler;
-						var storageData = data.data.attachments[storageUUID];
-
-						self._getRecordings(function(recordings) {
-							self._renderRecordingsTable(recordings);
-						});
-					} catch(e) {
-						monster.ui.alert(storageIsNotConfiguredMessage);
-					}
-				},
-				error: function(response) {
-					monster.ui.alert(storageIsNotConfiguredMessage);
-				}
+			self._getRecordings(function(recordings) {
+				self._renderRecordingsTable(recordings);
 			});
 		},
 
@@ -298,6 +276,8 @@ define(function(require) {
 				error: function(data) {
 					self.log('Error while getting devices');
 					self.log(data);
+					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'Device');
+					monster.ui.alert(errorMessage);
 				}
 			});
 		},
@@ -319,6 +299,8 @@ define(function(require) {
 				error: function(data) {
 					self.log('Error while getting users');
 					self.log(data);
+					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'User');
+					monster.ui.alert(errorMessage);
 				}
 			});
 		},
