@@ -27,4 +27,4 @@ gulp.task('clean-dist', function() {
 		.pipe(clean());
 });
 
-gulp.task('default', gulp.series('clean-dist', 'sass', 'copy-files'));
+gulp.task('default', gulp.series('clean-dist', 'copy-files', 'sass'));
