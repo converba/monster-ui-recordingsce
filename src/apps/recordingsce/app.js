@@ -215,7 +215,7 @@ define(function(require) {
 
 				self.log(template);
 
-				self.vars.$appContainer.find('#recordings-list-container').html(template);
+				self.vars.$appContainer.html(template);
 
 				self._initRecordingsTableBehavior();
 			});

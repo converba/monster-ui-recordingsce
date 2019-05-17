@@ -23,7 +23,7 @@
 	}
 }
 
-#recordings_app_container {
+#recordingsce_app_container {
 	/* Override dataTables plugin images to base 64 */
 	table.dataTable thead .sorting {
 		background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAN9JREFUeNpi/P//PwO1ABMxilasWMFJFcOABrEBqQNAWogaLisCYjMgbiGkkBFfmAFdIw2kbgAxDxD/BWKTiIiIC+S6rBpqEAgwA/FkslwGdJUBkDoDNQQZRANdt4xUl03GYhAItEMjhTjDgIqjgJQNDkvkGBkZi0iOAFIBCw6XVYC8g0cf1nDDFWZ9QPwIh9wRkiIAqPgXkKrEIgVKa7kkpzOo7UfQhGdRkmhzoa4BgS9A3Ep23oS6YhaU2wrkPyU5NtFADRAbA9NWH0GVoHRGCC9fvpyTGHVUTbQAAQYAw9p73eOEjMsAAAAASUVORK5CYII=');
@@ -85,10 +85,6 @@
 	h1 {
 		font-size: 29px;
 		font-weight: normal;
-	}
-
-	.app-content-wrapper {
-		padding-top: 0;
 	}
 
 	.app-content-wrapper > h1 {
@@ -504,7 +500,7 @@
 }
 
 @media (max-width: 700px) {
-	#recordings_app_container .recordings-table .buttons-wrapper .btn {
+	#recordingsce_app_container .recordings-table .buttons-wrapper .btn {
 		width: 12px;
 		overflow-x: hidden;
 
@@ -513,14 +509,14 @@
 		}
 	}
 
-	#recordings_app_container #recordings_wrapper table th,
-	#recordings_app_container #recordings_wrapper table td {
+	#recordingsce_app_container #recordings_wrapper table th,
+	#recordingsce_app_container #recordings_wrapper table td {
 		font-size: 16px;
 		padding: 6px 2px;
 	}
 
-	#recordings_app_container #recordings_wrapper table tr th:first-child,
-	#recordings_app_container #recordings_wrapper table tr td:first-child {
+	#recordingsce_app_container #recordings_wrapper table tr th:first-child,
+	#recordingsce_app_container #recordings_wrapper table tr td:first-child {
 		display: none;
 	}
 }
