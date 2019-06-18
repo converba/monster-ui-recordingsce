@@ -1,0 +1,51 @@
+{
+	"recordingsce": {
+		"title": "Записи разговоров",
+		"description": "Прослушивайте записи разговоров",
+		"universalErrorMessageTemplate": "Пожалуйста свяжитесь с системным администратором, чтобы настроить программный интерфейс %api%, необходимый для работы данного приложения",
+		"recordingsTable": {
+			"title": "Записи разговоров",
+			"columnHeader": {
+				"direction": "Входящий/Исходящий",
+				"datetime": "Дата и время",
+				"user": "Пользователь",
+				"device": "Устройство",
+				"dialerNumber": "Номер звонящего",
+				"duration": "Длительность",
+				"actions": "Действия"
+			},
+			"playBtnText": "Прослушать",
+			"downloadBtnText": "Скачать"
+		},
+		"filters": {
+			"datetime": {
+				"to": "по",
+				"allTime": "всё время",
+				"lastYear": "последний год",
+				"lastMonth": "последний месяц",
+				"lastWeek": "последняя неделя",
+				"lastDay": "последний день",
+				"lastHour": "последний час"
+			},
+			"direction": {
+				"all": "Вх/Исх",
+				"outbound": "Исх",
+				"inbound": "Вх"
+			},
+			"userName": {
+				"placeholder": "Выберите имя пользователя..."
+			},
+			"deviceName": {
+				"placeholder": "Выберите имя устройства..."
+			},
+			"duration": {
+				"title": "Длительность:",
+				"seconds": "сек."
+			},
+			"resetBtn": {
+				"text": "Сбросить фильтры"
+			}
+			
+		}
+	}
+}

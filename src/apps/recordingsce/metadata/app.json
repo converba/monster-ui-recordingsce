@@ -3,7 +3,11 @@
 	"i18n": {
 		"en-US": {
 			"label": "Recordings",
-			"description": "The Recordings app allows you to effectively work with call records"
+			"description": "Listen to the recordings of conversations"
+		},
+		"ru-RU": {
+			"label": "Записи разговоров",
+			"description": "Прослушивайте записи разговоров"
 		}
 	},
 	"tags": [
