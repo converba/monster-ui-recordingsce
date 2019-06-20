@@ -29,7 +29,7 @@ define(function(require) {
 
 		i18n: {
 			'en-US': { customCss: false },
-			'fr-FR': { customCss: false }
+			'ru-RU': { customCss: false }
 		},
 
 		// Defines API requests not included in the SDK
