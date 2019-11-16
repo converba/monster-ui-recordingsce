@@ -18,8 +18,8 @@
 		<div class="form-group">
 			<select class="form-control" id="direction">
 				<option value="all" selected>{{i18n.recordingsce.filters.direction.all}}</option>
-				<option value="OUT">{{i18n.recordingsce.filters.direction.outbound}}</option>
-				<option value="IN">{{i18n.recordingsce.filters.direction.inbound}}</option>
+				<option value="outbound">{{i18n.recordingsce.filters.direction.outbound}}</option>
+				<option value="inbound">{{i18n.recordingsce.filters.direction.inbound}}</option>
 			</select>
 		</div>
 	</div>
@@ -79,8 +79,8 @@
 	{{#each this.recordings}}
 		<tr class="js-item">
 			<td>{{inc @index}}</td>
-			<td>{{direction_formatted}}</td>
-			<td class="js-item-datetime">{{datetime}}</td>
+			<td data-sort="{{direction_key}}">{{direction_formatted}}</td>
+			<td data-sort="{{start}}" class="js-item-datetime">{{datetime}}</td>
 			<td class="js-item-owner">{{owner_name}}</td>
 			<td>{{device_name}}</td>
 			<td class="js-item-number">{{callee_id_number}}</td>

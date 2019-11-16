@@ -7,7 +7,7 @@
 			"title": "Записи разговоров",
 			"columnHeader": {
 				"direction": "Входящий/Исходящий",
-				"datetime": "Дата и время",
+				"datetime": "Дата/Время GMT+07:00",
 				"user": "Пользователь",
 				"device": "Устройство",
 				"dialerNumber": "Номер звонящего",
@@ -28,9 +28,9 @@
 				"lastHour": "последний час"
 			},
 			"direction": {
-				"all": "Вх/Исх",
-				"outbound": "Исх",
-				"inbound": "Вх"
+				"all": "Входящий/Исходящий",
+				"outbound": "Исходящий",
+				"inbound": "Входящий"
 			},
 			"userName": {
 				"placeholder": "Выберите имя пользователя..."

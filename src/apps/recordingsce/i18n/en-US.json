@@ -6,8 +6,8 @@
 		"recordingsTable": {
 			"title": "Recordings",
 			"columnHeader": {
-				"direction": "IN/OUT",
-				"datetime": "Datetime",
+				"direction": "Inbound/Outbound",
+				"datetime": "Date/Time GMT+07:00",
 				"user": "User",
 				"device": "Device",
 				"dialerNumber": "Dialer Number",
@@ -28,9 +28,9 @@
 				"lastHour": "last hour"
 			},
 			"direction": {
-				"all": "IN/OUT",
-				"outbound": "OUT",
-				"inbound": "IN"
+				"all": "Inbound/Outbound",
+				"outbound": "Outbound",
+				"inbound": "Inbound"
 			},
 			"userName": {
 				"placeholder": "Choose a user name..."

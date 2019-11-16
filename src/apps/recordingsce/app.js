@@ -164,20 +164,21 @@ define(function(require) {
 					uniqueUsersNames.add(recordings[i]['owner_name']);
 					duration = parseInt(recordings[i].duration);
 
-					recordings[i].timestamp = self._getTimestampFromGregorian(recordings[i].start);
-					// date string format: '2017-05-25 14:26:00'
-					recordings[i].datetime = new Date(recordings[i].timestamp)
-						.toISOString()
-						.substring(0,19)
-						.replace('T', ' ');
+					var date = monster.util.gregorianToDate(recordings[i].start);
+					var shortDate = monster.util.toFriendlyDate(date, 'shortDate');
+					var time = monster.util.toFriendlyDate(date, 'time');
+					recordings[i].datetime = shortDate + ' ' + time;
 
-					// format direction
-					if(recordings[i]['direction'] === 'outbound') {
-						recordings[i]['direction_formatted'] = 'OUT';
-					} else if(recordings[i]['direction'] === 'inbound') {
-						recordings[i]['direction_formatted'] = 'IN';
+					var isOutbound = recordings[i].hasOwnProperty('authorizing_id')
+						&& recordings[i].authorizing_id.length > 0;
+
+					var i18nDirection = self.i18n.active().recordingsce.filters.direction;
+					if(isOutbound) {
+						recordings[i]['direction_key'] = 'outbound';
+						recordings[i]['direction_formatted'] = i18nDirection.outbound;
 					} else {
-						recordings[i]['direction_formatted'] = recordings[i]['direction'];
+						recordings[i]['direction_key'] = 'inbound';
+						recordings[i]['direction_formatted'] = i18nDirection.inbound;
 					}
 
 					if(!maxDuration || duration > maxDuration) {
@@ -362,14 +363,12 @@ define(function(require) {
 			monster.ui.datepicker($dateFrom, {
 				changeMonth: true,
 				changeYear: true,
-				dateFormat: 'yy-mm-dd',
 				autoclose: true
 			});
 
 			monster.ui.datepicker($dateTo, {
 				changeMonth: true,
 				changeYear: true,
-				dateFormat: 'yy-mm-dd',
 				autoclose: true
 			});
 
@@ -384,15 +383,30 @@ define(function(require) {
 			});
 		},
 
+		_parseDate: function (dateStr) {
+			var datePickerFormat = 'mm/dd/yy',
+				userFormat = monster.hasOwnProperty('apps') && monster.apps.hasOwnProperty('auth') && monster.apps.auth.hasOwnProperty('currentUser')
+				&& monster.apps.auth.currentUser.hasOwnProperty('ui_flags') && monster.apps.auth.currentUser.ui_flags.hasOwnProperty('date_format')
+					? monster.apps.auth.currentUser.ui_flags.date_format : 'mdy';
+
+			if (userFormat === 'mdy') {
+				datePickerFormat = 'mm/dd/yy';
+			} else if (userFormat === 'dmy') {
+				datePickerFormat = 'dd/mm/yy';
+			} else if (userFormat === 'ymd') {
+				datePickerFormat = 'yy/mm/dd';
+			}
+			return $.datepicker.parseDate(datePickerFormat, dateStr);
+		},
+
 		_initDateTimeFilter: function(table) {
 			var self = this;
-
 			self._setDatetimeRangeByKey(self.settings.defaultDateRangeKey, table);
 
 			var getDate = function(element) {
 				var date;
 				try {
-					date = $.datepicker.parseDate('yy-mm-dd', element.value);
+					date = self._parseDate(element.value);
 				} catch( error ) {
 					date = null;
 				}
@@ -532,7 +546,8 @@ define(function(require) {
 
 		_initRecordingsTableBehavior: function() {
 			var self = this;
-
+			var i18n = self.i18n.active().recordingsce;
+			var i18nDirection = i18n.filters.direction;
 			self._initAudioPlayers();
 			self._initDateTimePickers();
 			self._initDataTablesFilters();
@@ -541,7 +556,7 @@ define(function(require) {
 				'bStateSave': false,
 				'lengthMenu': [[5, 25, 50, -1], [5, 25, 50, 'All']],
 				'aoColumns': [
-					null, null, {'sType': 'date'}, null, null, null, null, null
+					null, null, null, null, null, null, null, null
 				],
 				'initComplete': function(settings, json) {
 					// move filters outside Datatables wrapper in reserved containers
@@ -549,6 +564,15 @@ define(function(require) {
 					$('#recordings-list_filter').appendTo('#filter-search-box');
 				},
 				'columnDefs': [
+					{
+						'name': 'direction',
+						'targets': 1,
+						'render': function (data, type, row) {
+							if(i18nDirection.hasOwnProperty(data)) {
+								return i18nDirection[data];
+							} else return data;
+						}
+					},
 					{
 						'name': 'datetime',
 						'targets': 2,
@@ -617,29 +641,40 @@ define(function(require) {
 
 		_initDataTablesFilters: function() {
 			var self = this;
-			var parseDateTimeValue = function(rawDT) {
-				// rawDT example: '2017-05-25 14:26:00'
-				if(typeof(rawDT) === 'string') {
-					// '2017-05-25 14:26:00' to '20170525142600'
-					return rawDT.replace(/[\s\:\-]/g, '');
-				}
-			};
 
 			// reset filters
 			window.jQuery.fn.dataTable.ext.search = [];
 
 			// datetime filter
-			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-				var datetimeStart = parseDateTimeValue($('#date-from').val() + ' ' + $('#time-from').val() + ':00');
-				var datetimeEnd = parseDateTimeValue($("#date-to").val() + ' ' + $('#time-to').val() + ':00');
-				var evalDate= parseDateTimeValue(data[2]);
-				//self.log(evalDate + ' >= ' + datetimeStart + ' && ' + evalDate + ' <= ' + datetimeEnd);
-				return (evalDate >= datetimeStart && evalDate <= datetimeEnd);
+			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex, row, counter) {
+				var getTimestamp = function (dateStr, timeStr) {
+					var timeHoursStr = timeStr.split(':')[0],
+						timeMinutesStr = timeStr.split(':')[1],
+						timeSecondsStr = timeStr.split(':')[2],
+						dateObj = self._parseDate(dateStr);
+					if(!dateObj) {
+						return 0;
+					}
+					dateObj.setHours(dateObj.getHours() + parseInt(timeHoursStr));
+					dateObj.setMinutes(dateObj.getMinutes() + parseInt(timeMinutesStr));
+					dateObj.setSeconds(dateObj.getSeconds() + parseInt(timeSecondsStr));
+					return dateObj.getTime();
+				};
+				var startTimestamp = getTimestamp($('#date-from').val(), $('#time-from').val() + ':00');
+				var endTimestamp = getTimestamp($('#date-to').val(), $('#time-to').val() + ':00');
+
+				if(!startTimestamp || !endTimestamp ) {
+					return true;
+				}
+
+				var evalDateArr = data[2].split(' ');
+				var evalDate= getTimestamp(evalDateArr[0], evalDateArr[1]);
+				return (evalDate >= startTimestamp && evalDate <= endTimestamp);
 			});
 
 			// direction filter
-			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-				var evalDirection = data[1];
+			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex, row, counter) {
+				var evalDirection = row[1]['@data-sort'];
 				var direction = $('select#direction option:selected').val();
 				return (direction === 'all' || direction === evalDirection);
 			});
@@ -747,7 +782,7 @@ define(function(require) {
 
 				var $itemParent = $btn.closest('.js-item');
 				var datetime = $itemParent.find('.js-item-datetime').text()
-					.replace(/:/g, '-')
+					.replace(/[:\/]/g, '-')
 					.replace(/\s/g, '__');
 				var owner = $itemParent.find('.js-item-owner').text().replace(/\s/g, '_');
 				var number = $itemParent.find('.js-item-number').text();
