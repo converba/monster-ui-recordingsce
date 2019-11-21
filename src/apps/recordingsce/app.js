@@ -211,7 +211,8 @@ define(function(require) {
 						'minHHMMSS': minDurationHHMMSS,
 						'max': maxDuration,
 						'maxHHMMSS': maxDurationHHMMSS
-					}
+					},
+                    'timezone': 'GMT' + jstz.determine_timezone().offset()
 				}));
 
 				self.log(template);

@@ -7,7 +7,7 @@
 			"title": "Recordings",
 			"columnHeader": {
 				"direction": "Inbound/Outbound",
-				"datetime": "Date/Time GMT+07:00",
+				"datetime": "Date/Time",
 				"user": "User",
 				"device": "Device",
 				"dialerNumber": "Dialer Number",
