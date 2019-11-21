@@ -10,10 +10,6 @@
   .recordings-app #main_topbar_current_app_name[data-name="recordings"] {
     display: inline-block !important;
     vertical-align: middle; }
-  .recordings-app #main_topbar_current_app_icon {
-    transform: none;
-    vertical-align: middle; }
-
 #recordingsce_app_container {
   /* Override dataTables plugin images to base 64 */
   /* Override datepicker and timepicker */
