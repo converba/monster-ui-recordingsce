@@ -117,42 +117,45 @@ define(function(require) {
 			});
 		},
 
-		_getCDRs: function(callback) {
+        _getData: function (callback) {
+            var self = this;
+            monster.parallel({
+                currentUser: function (callback) {
+                    self._getCurrentUser(function (user) {
+                        callback(null, user);
+                    })
+                },
+                recordings: function (callback) {
+                    self._getRecordings(function (recordings) {
+                        callback(null, recordings);
+                    })
+                },
+                devices: function (callback) {
+                    self._getDevices(function (devices) {
+                        callback(null, devices);
+                    })
+                },
+                users: function (callback) {
+                    self._getUsers(function (users) {
+                        callback(null, users);
+                    })
+                }
+            }, function(error, results) {
+                callback && callback(results);
+            });
+        },
+
+        _renderRecordingsList: function() {
+            var self = this;
+
+            self._getData(function(data) {
+                self._renderRecordingsTable(data);
+            });
+        },
+		_renderRecordingsTable: function(data) {
 			var self = this;
 
-			self.log('Getting CDRs');
-
-			self.getAll({
-				resource: 'cdrs.list',
-				success: function(cdrs) {
-					self.log(cdrs);
-
-					if(typeof(callback) === 'function') {
-						callback(cdrs);
-					}
-				},
-				error: function(data) {
-					//_callback({}, uiRestrictions);
-					self.log('Error while getting cdrs');
-					self.log(data);
-					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'CDRs');
-					monster.ui.alert(errorMessage);
-				}
-			});
-		},
-
-		_renderRecordingsList: function() {
-			var self = this;
-
-			self._getRecordings(function(recordings) {
-				self._renderRecordingsTable(recordings);
-			});
-		},
-
-		_renderRecordingsTable: function(recordings) {
-			var self = this;
-
-			self._extendRecordings(recordings, function(recordings) {
+			self._extendRecordings(data, function(recordings) {
 				var uniqueUsersNames = new Set(),
 					uniqueDevicesNames = new Set(),
 					minDuration = 0,
@@ -212,7 +215,7 @@ define(function(require) {
 						'max': maxDuration,
 						'maxHHMMSS': maxDurationHHMMSS
 					},
-                    'timezone': 'GMT' + jstz.determine_timezone().offset()
+                    'timezone': data.currentUser.timezone || ''
 				}));
 
 				self.log(template);
@@ -227,39 +230,55 @@ define(function(require) {
 			return (gregorianTimestamp-62167219200)*1000;
 		},
 
-		_extendRecordings: function(recordings, callback) {
-			var self = this;
-			self.log('Extending recordings');
-			self._getDevices(function(devices){
-				for(var ri=0, rlen=recordings.length; ri<rlen; ri++) {
-					for(var di=0, dlen=devices.length; di<dlen; di++) {
-						if(recordings[ri].hasOwnProperty('custom_channel_vars')
-							&& recordings[ri]['custom_channel_vars'].hasOwnProperty('Authorizing-ID')
-							&& devices[di].id === recordings[ri]['custom_channel_vars']['Authorizing-ID']) {
-							recordings[ri].device_name = devices[di].name;
-							break;
-						}
-					}
-				}
+        _extendRecordings: function(data, callback) {
+            var self = this;
+            var recordings = data.recordings;
+            var devices = data.devices;
+            var users = data.users;
+            self.log('Extending recordings');
 
-				self._getUsers(function(users){
-					for(var rI=0, rLen=recordings.length; rI<rLen; rI++) {
-						for(var ui=0, ulen=users.length; ui<ulen; ui++) {
-							if(users[ui].id === recordings[rI].owner_id) {
-								recordings[rI].owner_name =
-									[users[ui].first_name, users[ui].last_name].join(' ');
-								break;
-							}
-						}
-					}
+            for(var ri=0, rlen=recordings.length; ri<rlen; ri++) {
+                for(var di=0, dlen=devices.length; di<dlen; di++) {
+                    if(recordings[ri].hasOwnProperty('custom_channel_vars')
+                        && recordings[ri]['custom_channel_vars'].hasOwnProperty('Authorizing-ID')
+                        && devices[di].id === recordings[ri]['custom_channel_vars']['Authorizing-ID']) {
+                        recordings[ri].device_name = devices[di].name;
+                        break;
+                    }
+                }
 
-					if(typeof(callback) === 'function') {
-						self.log(recordings);
-						callback(recordings);
-					}
-				});
-			});
-		},
+                for(var ui=0, ulen=users.length; ui<ulen; ui++) {
+                    if(users[ui].id === recordings[ri].owner_id) {
+                        recordings[ri].owner_name =
+                            [users[ui].first_name, users[ui].last_name].join(' ');
+                        break;
+                    }
+                }
+            }
+
+            callback && callback(recordings);
+        },
+
+        _getCurrentUser: function (callback) {
+            var self = this;
+
+            self.callApi({
+                resource: 'user.get',
+                data: {
+                    accountId: self.accountId,
+                    userId: self.userId,
+                },
+                success: function(data) {
+                    callback && callback(data.data);
+                },
+                error: function(data) {
+                    self.log('Error while getting user');
+                    self.log(data);
+                    var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'User');
+                    monster.ui.alert(errorMessage);
+                }
+            });
+        },
 
 		_getDevices: function(callback) {
 			var self = this;
