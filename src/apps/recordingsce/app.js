@@ -33,7 +33,13 @@ define(function(require) {
 		},
 
 		// Defines API requests not included in the SDK
-		requests: {},
+		requests: {
+			'recordingsce.userRecordings.list': {
+				'url': 'accounts/{accountId}/{userId}/recordings',
+				'verb': 'GET',
+				generateError: false
+			}
+		},
 
 		subscribe: {},
 
@@ -86,18 +92,13 @@ define(function(require) {
 				args = pArgs || {};
 				self.vars.$appContainer = args.container || $('#recordings_app_container .app-content-wrapper');
 
-			if(!monster.util.isAdmin()) {
-				self.log('Permission error. Use admin account for change storage settings');
-				return;
-			}
-
 			self._renderRecordingsList();
 		},
 
-		_getRecordings: function(callback) {
+		_getAdminRecordings: function(callback) {
 			var self = this;
 
-			self.log('Getting Recordings');
+			self.log('Getting admin\'s recordings');
 
 			self.getAll({
 				resource: 'recordings.list',
@@ -109,7 +110,7 @@ define(function(require) {
 					}
 				},
 				error: function(data) {
-					self.log('Error while getting recordings');
+					self.log('Error while getting admin\'s recordings');
 					self.log(data);
 					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'Recordings');
 					monster.ui.alert(errorMessage);
@@ -117,41 +118,73 @@ define(function(require) {
 			});
 		},
 
-        _getData: function (callback) {
-            var self = this;
-            monster.parallel({
-                currentUser: function (callback) {
-                    self._getCurrentUser(function (user) {
-                        callback(null, user);
-                    })
-                },
-                recordings: function (callback) {
-                    self._getRecordings(function (recordings) {
-                        callback(null, recordings);
-                    })
-                },
-                devices: function (callback) {
-                    self._getDevices(function (devices) {
-                        callback(null, devices);
-                    })
-                },
-                users: function (callback) {
-                    self._getUsers(function (users) {
-                        callback(null, users);
-                    })
-                }
-            }, function(error, results) {
-                callback && callback(results);
-            });
-        },
+		_getUserRecordings: function (callback) {
+			var self = this;
 
-        _renderRecordingsList: function() {
-            var self = this;
+			self.log('Getting user\'s recordings');
 
-            self._getData(function(data) {
-                self._renderRecordingsTable(data);
-            });
-        },
+			monster.request({
+				resource: 'recordingsce.userRecordings.list',
+				data: {
+					accountId: self.accountId,
+					userId: self.userId
+				},
+				success: function(data) {
+					self.log(data.data);
+
+					if(typeof(callback) === 'function') {
+						callback(data.data);
+					}
+				},
+				error: function(data) {
+					self.log('Error while getting user\'s recordings');
+					self.log(data);
+					var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'Recordings');
+					monster.ui.alert(errorMessage);
+				}
+			});
+		},
+
+		_getData: function (callback) {
+			var self = this;
+			var requestsList = {
+				recordings: function (callback) {
+					self._getUserRecordings(function (recordings) {
+						callback(null, recordings);
+					})
+				},
+				devices: function (callback) {
+					self._getDevices(function (devices) {
+						callback(null, devices);
+					})
+				},
+				users: function (callback) {
+					self._getUsers(function (users) {
+						callback(null, users);
+					})
+				}
+			};
+			if(monster.util.isAdmin()) {
+				requestsList.recordings = function (callback) {
+					self._getAdminRecordings(function (recordings) {
+						callback(null, recordings);
+					})
+				}
+			}
+
+			monster.parallel(requestsList, function(error, results) {
+				callback && callback(results);
+			});
+		},
+
+		_renderRecordingsList: function() {
+			var self = this;
+
+			self._getData(function(data) {
+				self._renderRecordingsTable(data);
+			});
+		},
+
 		_renderRecordingsTable: function(data) {
 			var self = this;
 
@@ -171,18 +204,6 @@ define(function(require) {
 					var shortDate = monster.util.toFriendlyDate(date, 'shortDate');
 					var time = monster.util.toFriendlyDate(date, 'time');
 					recordings[i].datetime = shortDate + ' ' + time;
-
-					var isOutbound = recordings[i].hasOwnProperty('authorizing_id')
-						&& recordings[i].authorizing_id.length > 0;
-
-					var i18nDirection = self.i18n.active().recordingsce.filters.direction;
-					if(isOutbound) {
-						recordings[i]['direction_key'] = 'outbound';
-						recordings[i]['direction_formatted'] = i18nDirection.outbound;
-					} else {
-						recordings[i]['direction_key'] = 'inbound';
-						recordings[i]['direction_formatted'] = i18nDirection.inbound;
-					}
 
 					if(!maxDuration || duration > maxDuration) {
 						maxDuration = duration;
@@ -205,6 +226,16 @@ define(function(require) {
 				var minDurationHHMMSS = new Date(1000 * minDuration).toISOString().substr(11, 8);
 				var maxDurationHHMMSS = new Date(1000 * maxDuration).toISOString().substr(11, 8);
 
+				var getTimezone = function () {
+					if (_.has(monster, 'apps.auth.currentUser.timezone')) {
+						return monster.apps.auth.currentUser.timezone;
+					}
+					if (_.has(monster, 'apps.auth.currentAccount.timezone')) {
+						return monster.apps.auth.currentAccount.timezone;
+					}
+					return '';
+				};
+
 				var template = $(monster.template(self, 'recordings-table', {
 					'recordings': recordings,
 					'usersNames': Array.from(uniqueUsersNames),
@@ -215,10 +246,8 @@ define(function(require) {
 						'max': maxDuration,
 						'maxHHMMSS': maxDurationHHMMSS
 					},
-                    'timezone': data.currentUser.timezone || ''
+					'timezone': getTimezone()
 				}));
-
-				self.log(template);
 
 				self.vars.$appContainer.html(template);
 
@@ -230,55 +259,34 @@ define(function(require) {
 			return (gregorianTimestamp-62167219200)*1000;
 		},
 
-        _extendRecordings: function(data, callback) {
-            var self = this;
-            var recordings = data.recordings;
-            var devices = data.devices;
-            var users = data.users;
-            self.log('Extending recordings');
+		_extendRecordings: function(data, callback) {
+			var self = this;
+			var recordings = data.recordings;
+			var devices = data.devices;
+			var users = data.users;
+			self.log('Extending recordings');
 
-            for(var ri=0, rlen=recordings.length; ri<rlen; ri++) {
-                for(var di=0, dlen=devices.length; di<dlen; di++) {
-                    if(recordings[ri].hasOwnProperty('custom_channel_vars')
-                        && recordings[ri]['custom_channel_vars'].hasOwnProperty('Authorizing-ID')
-                        && devices[di].id === recordings[ri]['custom_channel_vars']['Authorizing-ID']) {
-                        recordings[ri].device_name = devices[di].name;
-                        break;
-                    }
-                }
+			for(var ri=0, rlen=recordings.length; ri<rlen; ri++) {
+				for(var di=0, dlen=devices.length; di<dlen; di++) {
+					if(recordings[ri].hasOwnProperty('custom_channel_vars')
+						&& recordings[ri]['custom_channel_vars'].hasOwnProperty('Authorizing-ID')
+						&& devices[di].id === recordings[ri]['custom_channel_vars']['Authorizing-ID']) {
+						recordings[ri].device_name = devices[di].name;
+						break;
+					}
+				}
 
-                for(var ui=0, ulen=users.length; ui<ulen; ui++) {
-                    if(users[ui].id === recordings[ri].owner_id) {
-                        recordings[ri].owner_name =
-                            [users[ui].first_name, users[ui].last_name].join(' ');
-                        break;
-                    }
-                }
-            }
+				for(var ui=0, ulen=users.length; ui<ulen; ui++) {
+					if(users[ui].id === recordings[ri].owner_id) {
+						recordings[ri].owner_name =
+							[users[ui].first_name, users[ui].last_name].join(' ');
+						break;
+					}
+				}
+			}
 
-            callback && callback(recordings);
-        },
-
-        _getCurrentUser: function (callback) {
-            var self = this;
-
-            self.callApi({
-                resource: 'user.get',
-                data: {
-                    accountId: self.accountId,
-                    userId: self.userId,
-                },
-                success: function(data) {
-                    callback && callback(data.data);
-                },
-                error: function(data) {
-                    self.log('Error while getting user');
-                    self.log(data);
-                    var errorMessage = self.i18n.active().recordingsce.universalErrorMessageTemplate.replace('%api%', 'User');
-                    monster.ui.alert(errorMessage);
-                }
-            });
-        },
+			callback && callback(recordings);
+		},
 
 		_getDevices: function(callback) {
 			var self = this;
@@ -381,14 +389,12 @@ define(function(require) {
 			var $timeTo = $('#time-to');
 
 			monster.ui.datepicker($dateFrom, {
-				changeMonth: true,
-				changeYear: true,
+				showButtonPanel: true,
 				autoclose: true
 			});
 
 			monster.ui.datepicker($dateTo, {
-				changeMonth: true,
-				changeYear: true,
+				showButtonPanel: true,
 				autoclose: true
 			});
 
@@ -461,14 +467,6 @@ define(function(require) {
 
 				self._setDatetimeRangeByKey($(this).data('range'), table);
 			})
-		},
-
-		_initDirectionFilter: function(table) {
-			var self = this;
-			$('select#direction').on('change', function() {
-				table.draw();
-				self.log('direction redraw');
-			});
 		},
 
 		_initUserNameFilter: function(table) {
@@ -567,7 +565,6 @@ define(function(require) {
 		_initRecordingsTableBehavior: function() {
 			var self = this;
 			var i18n = self.i18n.active().recordingsce;
-			var i18nDirection = i18n.filters.direction;
 			self._initAudioPlayers();
 			self._initDateTimePickers();
 			self._initDataTablesFilters();
@@ -585,24 +582,15 @@ define(function(require) {
 				},
 				'columnDefs': [
 					{
-						'name': 'direction',
-						'targets': 1,
-						'render': function (data, type, row) {
-							if(i18nDirection.hasOwnProperty(data)) {
-								return i18nDirection[data];
-							} else return data;
-						}
-					},
-					{
 						'name': 'datetime',
-						'targets': 2,
+						'targets': 0,
 						'render': function (data, type, row) {
 							return data;
 						}
 					},
 					{
 						'name': 'duration',
-						'targets': 6,
+						'targets': 1,
 						'render': function (data, type, row) {
 								return new Date(1000 * data).toISOString().substr(11, 8);
 						}
@@ -619,7 +607,6 @@ define(function(require) {
 			});
 
 			self._initDateTimeFilter(table);
-			self._initDirectionFilter(table);
 			self._initUserNameFilter(table);
 			self._initDeviceNameFilter(table);
 			self._initDurationFilter(table);
@@ -687,22 +674,15 @@ define(function(require) {
 					return true;
 				}
 
-				var evalDateArr = data[2].split(' ');
+				var evalDateArr = data[0].split(' ');
 				var evalDate= getTimestamp(evalDateArr[0], evalDateArr[1]);
 				return (evalDate >= startTimestamp && evalDate <= endTimestamp);
-			});
-
-			// direction filter
-			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex, row, counter) {
-				var evalDirection = row[1]['@data-sort'];
-				var direction = $('select#direction option:selected').val();
-				return (direction === 'all' || direction === evalDirection);
 			});
 
 			// user name filter
 			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 				var namesArr = $("#user-name-select").val();
-				var evalName = data[3];
+				var evalName = data[2];
 				if(!namesArr || typeof(namesArr) === 'undefined' || !evalName) {
 					return true;
 				}
@@ -717,7 +697,7 @@ define(function(require) {
 			// device name filter
 			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 				var namesArr = $("#device-name-select").val();
-				var evalName = data[4];
+				var evalName = data[3];
 				if(!namesArr || typeof(namesArr) === 'undefined' || !evalName) {
 					return true;
 				}
@@ -733,7 +713,7 @@ define(function(require) {
 			window.jQuery.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
 				var min = parseInt($('#duration-range-min').data('seconds'));
 				var max = parseInt($('#duration-range-max').data('seconds'));
-				var evalArr = data[6].split(':'); // "00:02:46" to ['00', '02', '46']
+				var evalArr = data[1].split(':'); // "00:02:46" to ['00', '02', '46']
 				var evalSeconds = parseInt(evalArr[2]) // seconds
 					+ parseInt(evalArr[1]) * 60 // minutes
 					+ parseInt(evalArr[0]*60*60); // hours
@@ -805,9 +785,10 @@ define(function(require) {
 					.replace(/[:\/]/g, '-')
 					.replace(/\s/g, '__');
 				var owner = $itemParent.find('.js-item-owner').text().replace(/\s/g, '_');
-				var number = $itemParent.find('.js-item-number').text();
+				var callerNumber = $itemParent.find('.js-item-caller-number').text();
+				var calleeNumber = $itemParent.find('.js-item-callee-number').text();
 
-				var fileName = datetime + '__' + number + '__' + owner + '.mp3';
+				var fileName = datetime + '__' + callerNumber + '_' + calleeNumber + '__' + owner + '.mp3';
 
 				getAudio({
 					recordingId: recordingId,

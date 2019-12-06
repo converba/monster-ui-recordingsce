@@ -14,15 +14,6 @@
 			<a href="" class="js-set-date-range" data-range="last-hour">{{i18n.recordingsce.filters.datetime.lastHour}}</a>
 		</div>
 	</div>
-	<div class="filter-item direction-filter">
-		<div class="form-group">
-			<select class="form-control" id="direction">
-				<option value="all" selected>{{i18n.recordingsce.filters.direction.all}}</option>
-				<option value="outbound">{{i18n.recordingsce.filters.direction.outbound}}</option>
-				<option value="inbound">{{i18n.recordingsce.filters.direction.inbound}}</option>
-			</select>
-		</div>
-	</div>
 	<div class="filter-item user-name-filter">
 		<div class="form-group">
 			<select data-placeholder="{{i18n.recordingsce.filters.userName.placeholder}}" class="form-control" id="user-name-select" multiple>
@@ -63,13 +54,13 @@
 <table id="recordings-list" class="recordings-table">
 	<thead>
 		<tr>
-			<th>№</th>
-			<th>{{i18n.recordingsce.recordingsTable.columnHeader.direction}}</th>
 			<th>{{i18n.recordingsce.recordingsTable.columnHeader.datetime}} {{timezone}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.duration}}</th>
 			<th>{{i18n.recordingsce.recordingsTable.columnHeader.user}}</th>
 			<th>{{i18n.recordingsce.recordingsTable.columnHeader.device}}</th>
-			<th>{{i18n.recordingsce.recordingsTable.columnHeader.dialerNumber}}</th>
-			<th>{{i18n.recordingsce.recordingsTable.columnHeader.duration}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.callerNumber}}</th>
+			<th>{{i18n.recordingsce.recordingsTable.columnHeader.calleeNumber}}</th>
+			<th>№</th>
 			<th class="recordings-table__actions-col no-sort">
 				{{i18n.recordingsce.recordingsTable.columnHeader.actions}}
 			</th>
@@ -78,13 +69,13 @@
 	<tbody>
 	{{#each this.recordings}}
 		<tr class="js-item">
-			<td>{{inc @index}}</td>
-			<td data-sort="{{direction_key}}">{{direction_formatted}}</td>
 			<td data-sort="{{start}}" class="js-item-datetime">{{datetime}}</td>
+			<td>{{duration}}</td>
 			<td class="js-item-owner">{{owner_name}}</td>
 			<td>{{device_name}}</td>
-			<td class="js-item-number">{{callee_id_number}}</td>
-			<td>{{duration}}</td>
+			<td class="js-item-caller-number">{{caller_id_number}}</td>
+			<td class="js-item-callee-number">{{callee_id_number}}</td>
+			<td>{{inc @index}}</td>
 			<td class="recordings-table__actions-col">
 				<div class="buttons-wrapper">
 					<a class="btn js-play-recording" data-recording-id="{{id}}">

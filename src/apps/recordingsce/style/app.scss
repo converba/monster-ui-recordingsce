@@ -12,9 +12,8 @@
 		clear: both;
 	}
 
-	#main_topbar_current_app_name[data-name="recordings"] {
-		display: inline-block !important;
-		vertical-align: middle;
+	button.ui-datepicker-close {
+		display: none;
 	}
 }
 
