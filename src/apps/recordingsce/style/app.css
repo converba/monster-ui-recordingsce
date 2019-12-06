@@ -7,8 +7,15 @@
     display: block;
     content: '';
     clear: both; }
-  .recordings-app button.ui-datepicker-close {
+  .recordings-app .ui-datepicker .ui-datepicker-buttonpane .ui-datepicker-close {
     display: none; }
+  .recordings-app .ui-widget-content button.ui-state-default {
+    color: #22A5FF; }
+    .recordings-app .ui-widget-content button.ui-state-default.ui-state-hover {
+      border-color: #22A5FF;
+      background-color: #22A5FF;
+      background-image: none;
+      color: white; }
 
 #recordingsce_app_container {
   /* Override dataTables plugin images to base 64 */

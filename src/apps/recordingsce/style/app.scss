@@ -12,8 +12,20 @@
 		clear: both;
 	}
 
-	button.ui-datepicker-close {
+	.ui-datepicker .ui-datepicker-buttonpane .ui-datepicker-close {
 		display: none;
+	}
+
+	.ui-widget-content button {
+		&.ui-state-default {
+			color: #22A5FF;
+			&.ui-state-hover {
+				border-color: #22A5FF;
+				background-color: #22A5FF;
+				background-image: none;
+				color: white;
+			}
+		}
 	}
 }
 
