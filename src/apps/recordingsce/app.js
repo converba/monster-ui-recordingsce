@@ -575,6 +575,7 @@ define(function(require) {
 				'aoColumns': [
 					null, null, null, null, null, null, null, null
 				],
+                'order': [[ 0, 'desc' ]],
 				'initComplete': function(settings, json) {
 					// move filters outside Datatables wrapper in reserved containers
 					$('#recordings-list_length').appendTo('#filter-length-box');
