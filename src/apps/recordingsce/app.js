@@ -360,7 +360,9 @@ define(function(require) {
 			}, callApiData.data || {});
 
 			if(typeof(startKey) !== 'undefined') {
-				requestData.startKey = startKey;
+				requestData.filters = { 
+                                        start_key: startKey  
+                                };
 			}
 
 			self.callApi({
